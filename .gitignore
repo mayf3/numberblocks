@@ -1,0 +1,31 @@
+# Video files (1080p HD downloads - large binary files)
+*.mp4
+*.mkv
+*.avi
+*.mov
+*.webm
+*.m4v
+
+# Video directories (consolidated location)
+downloads/
+Season*/
+Specials*/
+*_HD/
+*_backup/
+*_1080p/
+
+# Subtitles
+subtitles/*.vtt
+subtitles/*.srt
+subtitles/*/
+
+# Python cache
+__cache__/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Generated artifacts
+.DS_Store
+Thumbs.db
+*.tmp
