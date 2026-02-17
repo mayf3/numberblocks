@@ -8,37 +8,57 @@ Consolidated 1080p HD episodes of Numberblocks from YouTube.
 
 ```
 numberblocks/
-├── downloads/          # 1080p HD video files (gitignored)
+├── downloads/          # 1080p HD video files organized by season (gitignored)
+│   ├── Season_1_HD/
+│   ├── Season_2_HD/
+│   ├── Season_3_HD/
+│   ├── Season_5_HD/
+│   ├── Season_7_HD/
+│   ├── Season_8_HD/
+│   └── Specials_HD/
 ├── src/
-│   ├── downloaders/    # Core downloader: download_all_videos.py
-│   ├── extractors/    # URL extraction and subtitle tools
-│   └── validators/    # Verification scripts
-├── scripts/            # Utility scripts
-├── subtitles/          # Subtitles (vtt, srt)
-├── data/              # JSON configs, logs, reports
-├── archive/           # Historical scripts (archived)
-└── docs/              # Documentation
+│   ├── download.py         # Main downloader (simplified, working)
+│   └── fetch_playlists.py  # Playlist metadata fetcher
+├── playlists.json          # Episode metadata and URLs
+└── README.md               # This file
 ```
 
 ---
 
 ## Quick Start
 
+### 1. Update Playlists (Optional)
 ```bash
-# Download all episodes
-python3 src/downloaders/download_all_videos.py
-
-# Verify downloads
-python3 src/downloaders/validate_downloads.py
+python3 src/fetch_playlists.py
 ```
+
+### 2. Download Episodes
+```bash
+python3 src/download.py
+```
+
+This will:
+- Read `playlists.json` for episode URLs
+- Download 1080p videos with English subtitles
+- Save to `downloads/Season_X_HD/` with naming format `S##E##_Title.mp4`
+- Skip already downloaded episodes
 
 ---
 
 ## Stats
 
-- **Total Episodes:** 105 (103 available, 2 unavailable)
+- **Total Episodes:** 129 files (after deduplication and standardization)
+- **Seasons:** 6 seasons + Specials
+  - Season 1: 15 episodes
+  - Season 2: 14 episodes
+  - Season 3: 31 episodes
+  - Season 5: 30 episodes
+  - Season 7: 15 episodes
+  - Season 8: 15 episodes
+  - Specials: 9 episodes
 - **Quality:** 1080p HD
-- **Size:** ~4.5GB
+- **Size:** ~5.9GB
+- **Naming:** Standardized to `S##E##_Title.mp4` format
 
 ---
 
