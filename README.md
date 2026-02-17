@@ -47,10 +47,10 @@ This will:
 
 ## Stats
 
-- **Total Episodes:** 128 files (after deduplication and standardization)
+- **Total Episodes:** 129 files (6 seasons + Specials)
 - **Seasons:** 6 seasons + Specials
   - Season 1: 15 episodes
-  - Season 2: 14 episodes (S02E05 missing)
+  - Season 2: 15 episodes ✓
   - Season 3: 30 episodes
   - Season 5: 30 episodes
   - Season 7: 15 episodes
