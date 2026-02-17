@@ -29,4 +29,9 @@ __pycache__/
 .DS_Store
 Thumbs.db
 *.tmp
-downloaded.txt
+
+# Download tracking files
+*_downloaded.txt
+
+# Series metadata (generated)
+*_playlists.json

@@ -1,0 +1,47 @@
+# Numberblocks Series Configuration
+# YouTube playlist IDs for each season
+
+series_name: "Numberblocks"
+description: "Learn to count with the Numberblocks - educational CBeebies cartoon"
+
+# Naming pattern for downloaded files
+# Available variables:
+#   {season} - season number (1, 2, 3...)
+#   {season:02d} - season number with leading zero (01, 02, 03...)
+#   {episode} - episode number
+#   {episode:02d} - episode number with leading zero
+#   {title} - video title (sanitized)
+naming_pattern: "S{season:02d}E{episode:02d}_{title}.mp4"
+
+# Directory naming
+#   {series_name} - series name
+#   {season} - season number
+#   {season_name} - season name from below
+directory_pattern: "Season_{season}_HD"
+
+# Video quality preference
+# Options: 1080, 720, 480, best
+quality: 1080
+
+# Subtitles
+subtitles:
+  enabled: true
+  lang: "en"
+  embed: true
+
+# Season playlists (YouTube playlist IDs)
+seasons:
+  Season 1: PL9swKX1PviEr9UfByZqJYiN8KX3AXqyXm
+  Season 2: PL9swKX1PviEru-LYxqyxH7rZGvw3zHQB
+  Season 3: PL9swKX1PviEruaholwotM1lOcNCQuweCl
+  Season 4: PL9swKX1PviEpcB-U4ugBkqPIGMYvQ5nP8
+  Season 5: PL9swKX1PviEph7heoMnLEfW2y28kwLNZw
+  Season 6: PL9swKX1PviEpqohvcXAr6KxPvuAzuFXVT
+  Season 7: PL9swKX1PviEovgpCesV8muL-i8RwogKvL
+  Season 8: PL9swKX1PviEo4WKwvN7y2vNiQkMfqNFUb
+
+# Special episodes (optional)
+specials:
+  enabled: true
+  # Add special episode playlist IDs here if available
+  # Special 1: PLAYLIST_ID
