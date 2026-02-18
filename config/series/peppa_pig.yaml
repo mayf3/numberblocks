@@ -1,32 +1,24 @@
 # Peppa Pig Series Configuration
-# Example configuration for Peppa Pig English episodes
+# TEST CONFIG - for development/testing only
 
 series_name: "Peppa Pig"
 description: "British preschool animated television series"
 
-# Naming pattern
 naming_pattern: "S{season:02d}E{episode:02d}_{title}.mp4"
 directory_pattern: "Season_{season}_HD"
 
-# Video quality
 quality: 1080
 
-# Subtitles
 subtitles:
-  enabled: false  # Peppa Pig usually doesn't have subtitles in the videos
+  enabled: false
   lang: "en"
   embed: false
 
-# Season playlists
-# NOTE: Replace with actual YouTube playlist IDs
-seasons:
-  # Example: Season 1: PLxxxxx
-  # Add your playlists here
-
-# Example format for individual episodes (if no playlists available)
-# episodes:
-#   Season 1:
-#     - title: "Muddy Puddles"
-#       id: "VIDEO_ID"
-#     - title: "Mr Dinosaur is Lost"
-#       id: "VIDEO_ID"
+episodes:
+  Season 1:
+    - title: "S01E01 The Christmas Morning Sea Swim"
+      id: "TmMlBhXc-pA"
+    - title: "S01E02 Building A Bridge In Tiny Land"
+      id: "-Y7IJO7ssyY"
+    - title: "S01E03 The Chocolate Factory"
+      id: "qX_dO_r7My4"

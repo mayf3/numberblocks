@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 """
-Generic Series Downloader
-Downloads episodes from YouTube playlists in 1080p HD
-Supports multiple series via YAML configuration files
+Simple Series Downloader
+Downloads episodes from YouTube based on YAML configuration
 """
-import json
 import subprocess
 import re
 import sys
@@ -20,54 +18,27 @@ def load_config(config_path: Path) -> dict:
         return yaml.safe_load(f)
 
 
-def load_playlists(playlists_file: Path) -> Dict:
-    """Load episode data from playlists JSON."""
-    if not playlists_file.exists():
-        raise FileNotFoundError(
-            f"{playlists_file} not found. Run: python3 src/fetch_playlists.py <series>"
-        )
-    
-    with open(playlists_file, encoding='utf-8') as f:
-        return json.load(f)
-
-
 def sanitize_title(title: str) -> str:
     """Clean title for filename."""
-    # Remove special characters but keep alphanumeric, spaces, hyphens
     title = re.sub(r'[^\w\s-]', '', title)
-    # Replace spaces with underscores
     title = title.replace(' ', '_')
-    # Remove multiple consecutive underscores
     title = re.sub(r'_+', '_', title)
-    # Remove leading/trailing underscores
     return title.strip('_')
 
 
 def parse_episode_info(title: str) -> Tuple[Optional[int], Optional[int]]:
-    """Parse season and episode from title."""
-    # Pattern: "... S1 E1 | ..." or "... Full Episode - S1 E1 | ..."
-    match = re.search(r'S(\d+)\s*E(\d+)', title)
+    """Parse season and episode from S##E## format in title."""
+    match = re.search(r'[Ss](\d+)[Ee](\d+)', title)
     if match:
         return int(match.group(1)), int(match.group(2))
     return None, None
 
 
-def get_season_dir(download_dir: Path, series_name: str, season_num: int, 
-                   config: dict, season_name: str = "") -> Path:
-    """Generate season directory path based on config pattern."""
-    pattern = config.get('directory_pattern', 'Season_{season}_HD')
-    dir_name = pattern.format(
-        series_name=series_name,
-        season=season_num,
-        season_name=season_name
-    )
-    return download_dir / dir_name
-
-
 def generate_filename(config: dict, season: int, episode: int, title: str) -> str:
     """Generate filename based on config pattern."""
     pattern = config.get('naming_pattern', 'S{season:02d}E{episode:02d}_{title}.mp4')
-    clean_title = sanitize_title(title)
+    clean_title = re.sub(r'^[Ss]\d+[Ee]\d+\s*', '', title)
+    clean_title = sanitize_title(clean_title)
     return pattern.format(
         season=season,
         episode=episode,
@@ -75,76 +46,69 @@ def generate_filename(config: dict, season: int, episode: int, title: str) -> st
     )
 
 
+def get_season_dir(download_dir: Path, series_name: str, season_num: int, config: dict) -> Path:
+    """Generate season directory path."""
+    pattern = config.get('directory_pattern', '{series_name}_Season_{season}')
+    dir_name = pattern.format(
+        series_name=series_name.replace(' ', '_'),
+        season=season_num
+    )
+    return download_dir / dir_name
+
+
 def check_existing_file(season_dir: Path, season: int, episode: int) -> bool:
-    """Check if episode already exists in any format."""
+    """Check if episode already exists."""
     if not season_dir.exists():
         return False
     
-    # Get all mp4 files and check if any match the season/episode
     for file_path in season_dir.glob("*.mp4"):
-        filename = file_path.name
-        # Look for SXXEXX pattern in filename (case insensitive)
-        match = re.search(r'[Ss](\d+)[Ee](\d+)', filename)
-        if match:
-            file_season = int(match.group(1))
-            file_episode = int(match.group(2))
-            if file_season == season and file_episode == episode:
-                return True
-    
+        match = re.search(r'[Ss](\d+)[Ee](\d+)', file_path.name)
+        if match and int(match.group(1)) == season and int(match.group(2)) == episode:
+            return True
     return False
 
 
 def download_episode(video_id: str, season: int, episode: int, title: str,
-                    season_dir: Path, config: dict, archive_file: Path) -> bool:
+                    output_path: Path, config: dict) -> bool:
     """Download single episode."""
-    season_dir.mkdir(parents=True, exist_ok=True)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
     
-    # Check if already downloaded (flexible matching)
-    if check_existing_file(season_dir, season, episode):
-        print(f"  [SKIP] Already exists: S{season}E{episode}")
+    if check_existing_file(output_path.parent, season, episode):
+        print(f"  [SKIP] S{season:02d}E{episode:02d} already exists")
         return True
     
-    filename = generate_filename(config, season, episode, title)
-    output_template = str(season_dir / filename)
-    
-    # Build yt-dlp command based on config
     quality = config.get('quality', 1080)
     cmd = [
         "python3", "-m", "yt_dlp",
         "-f", f"best[height<={quality}]",
-        "-o", output_template,
+        "-o", str(output_path),
         f"https://www.youtube.com/watch?v={video_id}"
     ]
     
-    # Add subtitle options if enabled
     subtitles = config.get('subtitles', {})
-    if subtitles.get('enabled', True):
+    if subtitles.get('enabled', False):
         cmd.extend(["--write-sub", "--sub-lang", subtitles.get('lang', 'en')])
-        if subtitles.get('embed', True):
+        if subtitles.get('embed', False):
             cmd.append("--embed-subs")
     
-    # Add archive file
-    cmd.extend(["--download-archive", str(archive_file)])
-    
-    print(f"  [DOWNLOAD] S{season}E{episode}: {title[:50]}...")
+    print(f"  [DOWNLOAD] S{season:02d}E{episode:02d}: {title[:40]}...")
     result = subprocess.run(cmd, capture_output=True, text=True)
     
     if result.returncode == 0:
         print(f"    ✓ Success")
         return True
     else:
-        error_msg = result.stderr[:150] if result.stderr else "Unknown error"
-        print(f"    ✗ Failed: {error_msg}")
+        error = result.stderr[:100] if result.stderr else "Unknown error"
+        print(f"    ✗ Failed: {error}")
         return False
 
 
 def main():
-    """Main download loop."""
+    """Main entry."""
     import argparse
     
     parser = argparse.ArgumentParser(description='Download series from YouTube')
-    parser.add_argument('config', nargs='?', default='numberblocks',
-                       help='Series config name (default: numberblocks)')
+    parser.add_argument('config', help='Series config name (e.g., numberblocks, peppa_pig)')
     parser.add_argument('--config-dir', default='config/series',
                        help='Directory containing series config files')
     parser.add_argument('--download-dir', default='downloads',
@@ -156,85 +120,63 @@ def main():
     
     # Load config
     config_path = Path(args.config_dir) / f"{args.config}.yaml"
-    try:
-        config = load_config(config_path)
-    except FileNotFoundError as e:
-        print(f"Error: {e}", file=sys.stderr)
+    if not config_path.exists():
+        print(f"Error: Config not found: {config_path}", file=sys.stderr)
         print(f"\nAvailable configs:")
-        config_dir = Path(args.config_dir)
-        if config_dir.exists():
-            for f in sorted(config_dir.glob('*.yaml')):
-                print(f"  - {f.stem}")
+        for f in sorted(Path(args.config_dir).glob('*.yaml')):
+            print(f"  - {f.stem}")
         return 1
     
+    config = load_config(config_path)
     series_name = config['series_name']
-    safe_name = series_name.lower().replace(' ', '_')
     
-    # Load playlists
-    playlists_file = Path(f"{safe_name}_playlists.json")
-    try:
-        playlists = load_playlists(playlists_file)
-    except FileNotFoundError as e:
-        print(f"Error: {e}", file=sys.stderr)
+    # Get episodes from config
+    episodes = config.get('episodes', {})
+    if not episodes:
+        print(f"Error: No episodes defined in config", file=sys.stderr)
         return 1
+    
+    total = sum(len(eps) for eps in episodes.values())
     
     download_dir = Path(args.download_dir)
-    archive_file = Path(f"{safe_name}_downloaded.txt")
     
     print("=" * 60)
-    print(f"{series_name} Downloader")
+    print(f"Downloading: {series_name}")
     print("=" * 60)
-    
-    total_episodes = sum(s['episode_count'] for s in playlists.values())
-    print(f"\nFound {len(playlists)} seasons, {total_episodes} episodes")
+    print(f"Total episodes: {total}")
     print(f"Download directory: {download_dir.absolute()}")
-    print(f"Archive file: {archive_file}")
-    
-    # Count existing episodes
-    existing_count = 0
-    for season_dir in download_dir.glob("*_HD"):
-        existing_count += len(list(season_dir.glob("*.mp4")))
-    print(f"Already downloaded: {existing_count} episodes")
     print()
     
-    # Ask for confirmation (unless --yes)
+    # Confirmation
     if not args.yes:
-        response = input("Start downloading missing episodes? [Y/n]: ").strip().lower()
+        response = input("Start downloading? [Y/n]: ").strip().lower()
         if response and response not in ('y', 'yes'):
             print("Cancelled.")
             return 0
     
-    # Download all
-    success = 0
-    failed = 0
-    skipped = 0
+    # Download
+    success = skipped = failed = 0
     
-    for season_name, season_data in playlists.items():
+    for season_name, season_episodes in episodes.items():
         print(f"\n{'=' * 60}")
-        print(f"Processing {season_name} ({season_data['episode_count']} episodes)")
+        print(f"{season_name} ({len(season_episodes)} episodes)")
         print(f"{'=' * 60}")
         
-        for ep in season_data['episodes']:
+        for ep in season_episodes:
             season_num, episode_num = parse_episode_info(ep['title'])
             
             if not season_num or not episode_num:
-                print(f"  [WARN] Cannot parse: {ep['title'][:50]}")
+                print(f"  [WARN] Cannot parse: {ep['title'][:40]}")
                 failed += 1
                 continue
             
-            # Get season directory based on config
-            season_dir = get_season_dir(
-                download_dir, series_name, season_num, config, season_name
-            )
+            season_dir = get_season_dir(download_dir, series_name, season_num, config)
+            filename = generate_filename(config, season_num, episode_num, ep['title'])
+            output_path = season_dir / filename
             
             result = download_episode(
-                ep['id'], 
-                season_num, 
-                episode_num, 
-                ep['title'],
-                season_dir,
-                config,
-                archive_file
+                ep['id'], season_num, episode_num, ep['title'],
+                output_path, config
             )
             
             if result:
@@ -245,17 +187,15 @@ def main():
             else:
                 failed += 1
     
-    # Summary
     print(f"\n{'=' * 60}")
-    print("DOWNLOAD SUMMARY")
+    print("SUMMARY")
     print(f"{'=' * 60}")
-    print(f"  New downloads: {success}")
-    print(f"  Skipped:       {skipped}")
-    print(f"  Failed:        {failed}")
-    print(f"  Total:         {success + skipped + failed}")
+    print(f"  Downloaded: {success}")
+    print(f"  Skipped:    {skipped}")
+    print(f"  Failed:     {failed}")
     
     return 0 if failed == 0 else 1
 
 
 if __name__ == "__main__":
-    exit(main())
+    sys.exit(main())

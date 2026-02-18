@@ -13,14 +13,11 @@ Supports multiple series via YAML configuration files.
 ├── config/
 │   └── series/
 │       ├── numberblocks.yaml    # Numberblocks configuration
-│       └── peppa_pig.yaml       # Example: Peppa Pig template
+│       └── peppa_pig.yaml       # TEST config - for development only
 ├── src/
-│   ├── download.py              # Generic downloader (supports any series)
-│   └── fetch_playlists.py       # Fetch metadata from YouTube
-├── downloads/                   # Downloaded videos (gitignored)
-│   └── Season_X_HD/
-├── numberblocks_playlists.json  # Fetched metadata
-└── numberblocks_downloaded.txt  # Download tracking (gitignored)
+│   └── download.py              # Generic downloader
+└── downloads/                   # Downloaded videos (gitignored)
+    └── Season_X_HD/
 ```
 
 ---
@@ -29,33 +26,17 @@ Supports multiple series via YAML configuration files.
 
 ### 1. Setup
 
-Install dependencies:
 ```bash
 pip install pyyaml yt-dlp
 ```
 
-### 2. Fetch Playlists
-
-For Numberblocks (default):
-```bash
-python3 src/fetch_playlists.py numberblocks
-```
-
-For other series (create config first):
-```bash
-python3 src/fetch_playlists.py peppa_pig
-```
-
-### 3. Download Episodes
+### 2. Download Episodes
 
 ```bash
-# Download Numberblocks
 python3 src/download.py numberblocks
 
-# Skip confirmation prompt
 python3 src/download.py numberblocks --yes
 
-# Download to custom directory
 python3 src/download.py numberblocks --download-dir /path/to/videos
 ```
 
@@ -66,36 +47,30 @@ python3 src/download.py numberblocks --download-dir /path/to/videos
 1. **Create config file** in `config/series/<series_name>.yaml`:
 
 ```yaml
-series_name: "Peppa Pig"
-description: "British preschool animated series"
+series_name: "My Series"
+description: "Series description"
 
-# Naming pattern for files
 naming_pattern: "S{season:02d}E{episode:02d}_{title}.mp4"
 directory_pattern: "Season_{season}_HD"
 
-# Video quality
 quality: 1080
 
-# Subtitles
 subtitles:
   enabled: true
   lang: "en"
   embed: true
 
-# YouTube playlist IDs
-seasons:
-  Season 1: PLxxxxx
-  Season 2: PLxxxxx
+episodes:
+  Season 1:
+    - title: "S01E01 Episode Title"
+      id: "YOUTUBE_VIDEO_ID"
+    - title: "S01E02 Another Episode"
+      id: "YOUTUBE_VIDEO_ID"
 ```
 
-2. **Fetch metadata**:
+2. **Download**:
 ```bash
-python3 src/fetch_playlists.py peppa_pig
-```
-
-3. **Download**:
-```bash
-python3 src/download.py peppa_pig
+python3 src/download.py my_series
 ```
 
 ---
@@ -104,7 +79,6 @@ python3 src/download.py peppa_pig
 
 ### Naming Patterns
 
-Available variables:
 - `{season}` - season number (1, 2, 3...)
 - `{season:02d}` - season with leading zero (01, 02...)
 - `{episode}` - episode number
@@ -115,7 +89,6 @@ Available variables:
 
 - `{series_name}` - series name
 - `{season}` - season number
-- `{season_name}` - full season name from config
 
 ---
 
