@@ -34,6 +34,13 @@ def parse_episode_info(title: str) -> Tuple[Optional[int], Optional[int]]:
     return None, None
 
 
+def get_episode_numbers(ep: dict) -> Tuple[Optional[int], Optional[int]]:
+    """Get season and episode numbers from config or parse from title."""
+    if 'season' in ep and 'episode' in ep:
+        return int(ep['season']), int(ep['episode'])
+    return parse_episode_info(ep.get('title', ''))
+
+
 def generate_filename(config: dict, season: int, episode: int, title: str) -> str:
     """Generate filename based on config pattern."""
     pattern = config.get('naming_pattern', 'S{season:02d}E{episode:02d}_{title}.mp4')
@@ -163,19 +170,19 @@ def main():
         print(f"{'=' * 60}")
         
         for ep in season_episodes:
-            season_num, episode_num = parse_episode_info(ep['title'])
+            season_num, episode_num = get_episode_numbers(ep)
             
             if not season_num or not episode_num:
-                print(f"  [WARN] Cannot parse: {ep['title'][:40]}")
+                print(f"  [WARN] Missing season/episode: {ep.get('title', ep.get('id', 'unknown'))[:40]}")
                 failed += 1
                 continue
             
             season_dir = get_season_dir(download_dir, series_name, season_num, config)
-            filename = generate_filename(config, season_num, episode_num, ep['title'])
+            filename = generate_filename(config, season_num, episode_num, ep.get('title', f"Episode_{episode_num}"))
             output_path = season_dir / filename
             
             result = download_episode(
-                ep['id'], season_num, episode_num, ep['title'],
+                ep['id'], season_num, episode_num, ep.get('title', ''),
                 output_path, config
             )
             

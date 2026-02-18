@@ -1,4 +1,4 @@
-# Video files (1080p HD downloads - large binary files)
+# Video files
 *.mp4
 *.mkv
 *.avi
@@ -6,32 +6,20 @@
 *.webm
 *.m4v
 
-# Video directories (consolidated location)
+# Video directories
 downloads/
 Season*/
 Specials*/
 *_HD/
-*_backup/
-*_1080p/
 
 # Subtitles
-subtitles/*.vtt
-subtitles/*.srt
-subtitles/*/
+*.vtt
+*.srt
 
-# Python cache
-__cache__/
+# Python
 __pycache__/
 *.pyc
-.pytest_cache/
 
-# Generated artifacts
+# OS
 .DS_Store
 Thumbs.db
-*.tmp
-
-# Download tracking files
-*_downloaded.txt
-
-# Series metadata (generated)
-*_playlists.json

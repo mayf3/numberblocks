@@ -16,9 +16,15 @@ subtitles:
 
 episodes:
   Season 1:
-    - title: "S01E01 The Christmas Morning Sea Swim"
+    - title: "The Christmas Morning Sea Swim"
       id: "TmMlBhXc-pA"
-    - title: "S01E02 Building A Bridge In Tiny Land"
+      season: 1
+      episode: 1
+    - title: "Building A Bridge In Tiny Land"
       id: "-Y7IJO7ssyY"
-    - title: "S01E03 The Chocolate Factory"
+      season: 1
+      episode: 2
+    - title: "The Chocolate Factory"
       id: "qX_dO_r7My4"
+      season: 1
+      episode: 3

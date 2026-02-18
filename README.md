@@ -66,6 +66,10 @@ episodes:
       id: "YOUTUBE_VIDEO_ID"
     - title: "S01E02 Another Episode"
       id: "YOUTUBE_VIDEO_ID"
+    - title: "Custom Title Without S##E##"
+      id: "YOUTUBE_VIDEO_ID"
+      season: 1
+      episode: 3
 ```
 
 2. **Download**:
