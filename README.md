@@ -16,6 +16,10 @@ Supports multiple series via YAML configuration files.
 │       └── peppa_pig.yaml       # TEST config - for development only
 ├── src/
 │   └── download.py              # Generic downloader
+├── tests/                       # Unit tests
+│   ├── test_config.py
+│   ├── test_filename.py
+│   └── test_parser.py
 └── downloads/                   # Downloaded videos (gitignored)
     └── Season_X_HD/
 ```
@@ -38,6 +42,19 @@ python3 src/download.py numberblocks
 python3 src/download.py numberblocks --yes
 
 python3 src/download.py numberblocks --download-dir /path/to/videos
+```
+
+---
+
+## Development
+
+### Running Tests
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install pytest pyyaml
+python -m pytest tests/ -v
 ```
 
 ---
