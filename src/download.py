@@ -87,6 +87,7 @@ def download_episode(video_id: str, season: int, episode: int, title: str,
     quality = config.get('quality', 1080)
     cmd = [
         "python3", "-m", "yt_dlp",
+        "--remote-components", "ejs:github",
         "-f", f"best[height<={quality}]",
         "-o", str(output_path),
         f"https://www.youtube.com/watch?v={video_id}"
@@ -172,7 +173,7 @@ def main():
         for ep in season_episodes:
             season_num, episode_num = get_episode_numbers(ep)
             
-            if not season_num or not episode_num:
+            if season_num is None or episode_num is None:
                 print(f"  [WARN] Missing season/episode: {ep.get('title', ep.get('id', 'unknown'))[:40]}")
                 failed += 1
                 continue

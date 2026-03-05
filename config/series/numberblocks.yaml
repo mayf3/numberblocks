@@ -271,11 +271,21 @@ episodes:
   Specials:
     - title: "S00E01 Treasure Of Hexagon Island"
       id: "SVWo8e0Eks"
+      season: 0
+      episode: 1
     - title: "S00E02 Twelve Days Of Christmas"
       id: "5j8zQFn9hgE"
+      season: 0
+      episode: 2
     - title: "S00E03 About Time"
       id: "oyaDS_C3mOQ"
+      season: 0
+      episode: 3
     - title: "S00E04 Double Back"
       id: "tpeUFIzG_Zg"
+      season: 0
+      episode: 4
     - title: "S00E05 Escape to Space"
       id: "nWsJsQ0RUUg"
+      season: 0
+      episode: 5

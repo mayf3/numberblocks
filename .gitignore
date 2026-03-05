@@ -22,6 +22,10 @@ __pycache__/
 .venv/
 .pytest_cache/
 
+# Logs
+*.log
+nohup.out
+
 # OS
 .DS_Store
 Thumbs.db

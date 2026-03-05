@@ -46,6 +46,43 @@ python3 src/download.py numberblocks --download-dir /path/to/videos
 
 ---
 
+## Troubleshooting
+
+### YouTube Download Errors
+
+If you encounter `ERROR: [youtube] This video is not available`, YouTube has updated their anti-bot protection. The downloader now includes automatic bypass using:
+
+```bash
+yt-dlp --remote-components ejs:github
+```
+
+**Requirements:**
+- `deno` runtime (for JavaScript challenge solving)
+- Internet connection (to fetch solver scripts)
+
+**Manual Installation:**
+```bash
+# Install deno (if not present)
+curl -fsSL https://deno.land/install.sh | sh
+
+# Verify installation
+deno --version
+```
+
+### Special Episodes Not Downloading
+
+If Special/Extra episodes fail with `[WARN] Missing season/episode`, ensure your config includes explicit season/episode numbers:
+
+```yaml
+Specials:
+  - title: "S00E01 Episode Title"
+    id: "YOUTUBE_VIDEO_ID"
+    season: 0  # Explicitly set season
+    episode: 1  # Explicitly set episode
+```
+
+---
+
 ## Development
 
 ### Running Tests
